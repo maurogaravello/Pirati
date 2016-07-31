@@ -9,7 +9,7 @@ import logging
 class pirates(object):
 
     def __init__(self, x_1, x_2, y_1, y_2, n_x, n_y, M, tMax, d_o,
-                 InitialDatum_rho, InitialDatum_A, speed_ships, nu):
+                 InitialDatum_rho, InitialDatum_A, speed_ships, nu, DirName):
         """
         Initializatium function for the class.
         :param x_1: float. Lower bound for x-coordinate of the domain
@@ -32,6 +32,8 @@ class pirates(object):
         :param speed_ships: function. It gives the speed of ship when density is A
         :param nu: tuple of two functions. They give the geometrical direction of
                    the ships.
+        :param DirName: string. It gives the name of the working directory, i.e. of
+                        the directory containing the simulation
 
         """
 
@@ -61,6 +63,9 @@ class pirates(object):
         # ships' velocity
         self.ships_speed = speed_ships
         self.ships_direction = nu
+
+        # base directory
+        self.base_directory = DirName
 
     #
     # Function for creating the meshes
