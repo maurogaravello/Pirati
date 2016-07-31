@@ -7,11 +7,14 @@ import sys
 import os
 import argparse
 import numpy
+import logging
+from datetime import datetime
+
 
 path = os.path.join(os.getcwd(), "lib")
 sys.path.insert(0, path)
 
-
+import pirates
 
 if __name__ == '__main__':
 
@@ -23,6 +26,25 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     dirName = args.DirName
+
+    filelog = os.path.join(dirName, 'Simulation-pirates.txt')
+
+    try:
+        os.remove(filelog)
+    except OSError:
+        pass
+
+    logging.basicConfig(filename = filelog,
+                        filemod = 'w', level = logging.DEBUG)
+    
+    logging.info('Started  at ' + str(datetime.now()))
+
     # Reads all parameters, Initial Datum, Flow and MaxCharSpeed
     execfile(os.path.join(dirName, "parameters.py"))
+
+    
+    simul_pirates = pirates.pirates(x_1, x_2, y_1, y_2, n_x, n_y, M, tMax, d_o,
+                                    InitialDatum_rho, InitialDatum_A,
+                                    speed_ships, nu)
+
 
