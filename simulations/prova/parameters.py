@@ -41,7 +41,9 @@ def InitialDatum_rho (x, y):
 
 # Initial Datum for A (density of ships)
 def InitialDatum_A (x, y):
-    return numpy.zeros_like(x)
+    A1 = numpy.logical_and(2 <= x, x <=4) * numpy.ones_like(x) * numpy.logical_and(2 <= y, y <=4) * numpy.ones_like(y)
+    A2 = numpy.logical_and(2 <= x, x <=4) * numpy.ones_like(x) * numpy.logical_and(8 <= y, y <=12) * numpy.ones_like(y)
+    return A1 + A2
 
 # Initial Datum for police vessels
 # d_o -> list of size M
