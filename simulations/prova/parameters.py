@@ -62,7 +62,11 @@ def speed_ships(A):
 
 # geometric vector speed
 def nu(x,y):
-    return (1., 0.)
+    x_mesh, y_mesh = numpy.meshgrid(x, y)
+    nu_x = numpy.ones_like(x_mesh + y_mesh)
+    nu_y = numpy.zeros_like(x_mesh + y_mesh)
+
+    return (nu_x, nu_y)
 
 
 

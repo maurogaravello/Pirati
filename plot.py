@@ -34,9 +34,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = desc, prog = "simulation.py")
     parser.add_argument('DirName', type=str, help="Enter the name of the directory")
 
+    # initial data
     parser.add_argument('-id', '--initial_data', dest='init_data', action='store_true')
-    parser.add_argument('-gvf', '--geometric_vector_field', dest='geometric_vector_field', action='store_true')
     parser.add_argument('-l', '--levels_color', type = check_negative, help="Enter the number of working processors", default = 10)
+
+    # geometric vector field    
+    parser.add_argument('-gvf', '--geometric_vector_field', dest='geometric_vector_field', action='store_true', help='Plot the geometric vector field')
+    parser.add_argument('-vf_x', '--horizontal_points_vf', type = check_negative, help="Enter the number of horizontal points for the vector field", default = 10)
+    parser.add_argument('-vf_y', '--vertical_points_vf', type = check_negative, help="Enter the number of vertical points for the vector field", default = 10)
 
     parser.add_argument('-p', '--processors', type = check_negative, help="Enter the number of working processors", default = 1)
 
@@ -72,4 +77,4 @@ if __name__ == '__main__':
         plt.plot_initial_data(simul_pirates, args.levels_color)
 
     if args.geometric_vector_field:
-        plt.plt_geometric_vector_speed(simul_pirates)
+        plt.plt_geometric_vector_speed(simul_pirates, args.horizontal_points_vf, args.vertical_points_vf)

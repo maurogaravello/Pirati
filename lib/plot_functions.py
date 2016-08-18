@@ -69,17 +69,17 @@ def plt_contour(x, y, function, title, name, dir, police_position, levels=10):
 #
 # plot the geometric vector speed
 #
-def plt_geometric_vector_speed(pirates):
-    h_p = 10
-    v_p = 20
+def plt_geometric_vector_speed(pirates, h_p, v_p):
     x = numpy.linspace(pirates.x[0], pirates.x[-1], h_p)
     y = numpy.linspace(pirates.y[0], pirates.y[-1], v_p)
     x_mesh, y_mesh = numpy.meshgrid(x, y)
     vf = matplotlib.pyplot.figure(1)
 
-    print numpy.ones_like(x_mesh + y_mesh)
-    dx = numpy.ones_like(x_mesh + y_mesh)
-    dy = numpy.zeros_like(x_mesh + y_mesh)
+    (dx, dy) = pirates.ships_direction(x, y)
     matplotlib.pyplot.quiver(x_mesh, y_mesh, dx, dy)
-    matplotlib.pyplot.show(vf)
+    matplotlib.pyplot.title('Geometric vector field $\\nu$', fontsize = 18)
+    #matplotlib.pyplot.show(vf)
+    matplotlib.pyplot.draw()
+    full_name = os.path.join(pirates.base_directory, 'plot_gvf.png')
+    matplotlib.pyplot.savefig(full_name)
     matplotlib.pyplot.close(vf)
