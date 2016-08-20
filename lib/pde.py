@@ -42,8 +42,53 @@ def one_step_parabolic(u, x, y, f1, f2, dx, dy, dt):
     return u_new
 
 
-def one_step_hyperbolic():
-    pass
+#
+# function for solving the 2d hyperbolic equation
+# \pt A + div(A v(A) w(t,x)) = 0
+# with an explicit Lax-Friedrics method
+# 
+#
+def one_step_hyperbolic(A, v, w_x, w_y, dx, dy, dt):
+    """
+    This function performs a one time step for the hyperbolic equation
+    \partial_t A + div(A v(A) w(x, y)) = 0
+    by a 2D Lax-Friedrics method. It is important that the support of A
+    is strictly contained in the integration domain!!
+    
+    :param A: numpy 2d array describing the state at time t
+    :param x: numpy 2d array describing the x-mesh. Same shape as A
+    :param y: numpy 2d array describing the y-mesh. Same shape as A
+    :param v: function. It gives the speed of ships depending on the density
+    :param w_x: numpy 2d array of the same shape of A
+                describing the x component of w
+    :param w_y: numpy 2d array of the same shape of A
+                describing the y component of w
+    :param dx: float. The size of the x-mesh
+    :param dy: float. The size of the y-mesh
+    :param dt: float. The time step. It should satisfy a stability condition
+
+    :output A_new: numpy 2d array of the same shape as A describing the state at
+                   time t + dt
+
+    """
+    assert (numpy.shape(A) == numpy.shape(x))
+    assert (numpy.shape(A) == numpy.shape(y))
+
+    A = augment(A)
+
+    # Calculate the numerical flux divergence
+    
+    f = augment(A * v(A) * w_x)
+    g = augment(A * v(A) * w_y)
+    
+    f_x = (1. / (2. * dx)) * (f[1:-1, 2:] - f[1:-1, :-2])
+    g_y = (1. / (2. * dy)) * (g[2:, 1:-1] - g[:-2, 1:-1])
+
+    
+    # Calculate the solution at time t + dt
+    A_new = .25 * (A[1:-1, 2:] + A[1:-1, :-2] + A[2:, 1:-1] + A[:-2, 1:-1]) - dt * (f_x + g_y)
+
+    return A_new
 
 
 def augment(u):
