@@ -43,6 +43,9 @@ if __name__ == '__main__':
     parser.add_argument('-vf_x', '--horizontal_points_vf', type = check_negative, help="Enter the number of horizontal points for the vector field", default = 10)
     parser.add_argument('-vf_y', '--vertical_points_vf', type = check_negative, help="Enter the number of vertical points for the vector field", default = 10)
 
+    # kernels
+    parser.add_argument('-k', '--kernels', dest='kernels', action='store_true', help='Plot the kernels and cut-off functions')
+    
     parser.add_argument('-p', '--processors', type = check_negative, help="Enter the number of working processors", default = 1)
 
        
@@ -70,7 +73,7 @@ if __name__ == '__main__':
     
     simul_pirates = pirates.pirates(x_1, x_2, y_1, y_2, n_x, n_y, M, tMax, d_o,
                                     InitialDatum_rho, InitialDatum_A,
-                                    speed_ships, nu, dirName)
+                                    speed_ships, nu, dirName, mathcal_K, cut_off_C)
 
 
     if args.init_data:
@@ -78,3 +81,10 @@ if __name__ == '__main__':
 
     if args.geometric_vector_field:
         plt.plt_geometric_vector_speed(simul_pirates, args.horizontal_points_vf, args.vertical_points_vf)
+
+
+    if args.kernels:
+        x = numpy.linspace(-1.5,1.5,50)
+        y = numpy.linspace(-1.5,1.5,50)
+        
+        plt.plt_kernels(simul_pirates, x, y, 100, 100)

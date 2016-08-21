@@ -83,3 +83,47 @@ def plt_geometric_vector_speed(pirates, h_p, v_p):
     full_name = os.path.join(pirates.base_directory, 'plot_gvf.png')
     matplotlib.pyplot.savefig(full_name)
     matplotlib.pyplot.close(vf)
+
+
+#
+# plot the kernels and the cut-off functions 
+#
+def plt_kernels(pirates, x, y, h_p = 50, v_p = 50, levels = 50):
+    
+    x_mesh, y_mesh = numpy.meshgrid(x, y)
+
+    vf = matplotlib.pyplot.figure(1)
+
+    # plotting contour with colorbar
+    matplotlib.pyplot.contourf(x, y, pirates.mathcal_K(x, y), levels)
+    matplotlib.pyplot.colorbar()
+
+    # plotting title
+    title = '$\\mathcal{K}$ kernel'
+    matplotlib.pyplot.title(title)
+
+    # saving the plot
+    matplotlib.pyplot.draw()
+    #matplotlib.pyplot.show(vf)
+    full_name = os.path.join(pirates.base_directory, 'plot_kernel_K.png')
+    matplotlib.pyplot.savefig(full_name)
+    matplotlib.pyplot.close(vf)
+
+    
+    vf = matplotlib.pyplot.figure(1)
+
+    # plotting contour with colorbar
+    matplotlib.pyplot.contourf(x, y, pirates.cut_off_C(x, y), levels)
+    matplotlib.pyplot.colorbar()
+
+    # plotting title
+    title = 'Cut-off function $\\mathcal{C}$'
+    matplotlib.pyplot.title(title)
+
+    # saving the plot
+    matplotlib.pyplot.draw()
+    #matplotlib.pyplot.show(vf)
+    full_name = os.path.join(pirates.base_directory, 'plot_cut-off_C.png')
+    matplotlib.pyplot.savefig(full_name)
+    matplotlib.pyplot.close(vf)
+    

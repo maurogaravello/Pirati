@@ -9,7 +9,8 @@ import logging
 class pirates(object):
 
     def __init__(self, x_1, x_2, y_1, y_2, n_x, n_y, M, tMax, d_o,
-                 InitialDatum_rho, InitialDatum_A, speed_ships, nu, DirName):
+                 InitialDatum_rho, InitialDatum_A, speed_ships, nu, DirName,
+                 mathcal_K, cut_off_C):
         """
         Initializatium function for the class.
         :param x_1: float. Lower bound for x-coordinate of the domain
@@ -66,6 +67,10 @@ class pirates(object):
 
         # base directory
         self.base_directory = DirName
+
+        # kernels and cut-off
+        self.mathcal_K = mathcal_K
+        self.cut_off_C = cut_off_C
 
     #
     # Function for creating the meshes

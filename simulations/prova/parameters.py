@@ -69,11 +69,29 @@ def nu(x,y):
     return (nu_x, nu_y)
 
 
+#######################################################
+## Various kernels and cut-off
+#######################################################
+
+# Standard mollifier
+def std_moll(x, y, radius = 1.):
+    x_mesh, y_mesh = numpy.meshgrid(x, y)
+    # k = (x_mesh**2 + y_mesh**2 < radius**2) * numpy.exp(1. / (x_mesh**2 + y_mesh**2 - radius))
+
+    k = (x_mesh**2 + y_mesh**2 < radius**2) * (radius**2 - x_mesh**2 - y_mesh**2)
+    C = numpy.trapz(numpy.trapz(k, x), y)
+    return k / C
+    
+# Kernel mathcal_K (eq. for pirates)
+def mathcal_K(x, y):
+    radius = .5
+    return std_moll(x, y, radius)
 
 
-
-
-
+# cut-off C
+def cut_off_C(x, y):
+    radius = .4
+    return std_moll(x, y, radius)
 
 
 
