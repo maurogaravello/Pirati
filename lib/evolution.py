@@ -15,12 +15,16 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
 
     :param p_density: numpy 2d array describing the density of pirates at time t
     :param s_density: numpy 2d array describing the density of ships at time t
+    :param police: list containing the position of police
     :param xx: numpy 2d array describing the x-mesh. Same shape as p_density
                and s_density
     :param yy: numpy 2d array describing the y-mesh. Same shape as p_density
                and s_density
     :param p_kernel: numpy 2d array describing the kernel in the equation for
                      pirates. Same shape as p_density
+   
+
+
 
     :param f1: float. 
     :param f2: function of x and y. It returns a 2d array of the same shape of u
@@ -47,17 +51,26 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
 
     # 2d convolution on a fixed mesh
     # h * k [n, m] = dx * dy * convolve2d(h, k)
-    p_convolution = dx * dy * scipy.signal.convolve2d(p_density, p_kernel, mode='same')
+    p_convolution = dx * dy * scipy.signal.convolve2d(s_density, p_kernel, mode='same')
     # gradient of the convolution
-    grad_py, grad_px = numpy.gradient(p_convolution, dx, dy)
+    grad_py, grad_px = numpy.gradient(p_convolution, dy, dx)
     # norm of the gradient
     norm_grad_p_convolution = numpy.sqrt(grad_px**2 + grad_py**2)
+    flux_x = kappa(norm_grad_p_convolution) * grad_px * p_density
+    flux_y = kappa(norm_grad_p_convolution) * grad_py * p_density
+    # divergence
+    trash, div1 = numpy.gradient(flux_x, dy, dx)
+    div2, trash = numpy.gradient(flux_y, dy, dx)
+    div = - div1 - div2
 
     
     # term depending on the police
-    f = .....
+    f = numpy.zeros_like(xx)
+    for i in xrange(len(police)):
+        f += cut_off(xx - police[i][0], yy - police[i][1])
+    
 
-    p_new = pde.one_step_parabolic(p_density, xx, yy, ...., f, dx, dy, dt)
+    p_new = pde.one_step_parabolic(p_density, xx, yy, div,...., f, dx, dy, dt)
 
     ################################
     # Evolution of ship density

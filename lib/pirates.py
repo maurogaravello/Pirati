@@ -10,7 +10,7 @@ class pirates(object):
 
     def __init__(self, x_1, x_2, y_1, y_2, n_x, n_y, M, tMax, d_o,
                  InitialDatum_rho, InitialDatum_A, speed_ships, nu, DirName,
-                 mathcal_K, cut_off_C):
+                 mathcal_K, cut_off_C, kappa):
         """
         Initializatium function for the class.
         :param x_1: float. Lower bound for x-coordinate of the domain
@@ -36,6 +36,11 @@ class pirates(object):
         :param DirName: string. It gives the name of the working directory, i.e. of
                         the directory containing the simulation
 
+        :param mathcal_K: function describing the kernel in the equation for pirates
+        :param cut_off_C: function describing the kernel in the equation for ships
+                          and in the term for police
+        :param kappa: function. It gives the normalization for the
+                      direction in the equation for pirates
         """
 
         # 2d domains
@@ -72,6 +77,9 @@ class pirates(object):
         self.mathcal_K = mathcal_K
         self.cut_off_C = cut_off_C
         self.create_kernels()
+
+        # normalization function kappa
+        self.kappa = kappa
     #
     # Function for creating the meshes
     #

@@ -25,6 +25,10 @@ sys.path.insert(0, path)
 
 import pirates
 
+def ff(x, y):    
+    # return numpy.maximum(1. - x**2 - y**2, 0.)
+    return numpy.maximum(1. - numpy.absolute(y), 0.)
+
 if __name__ == '__main__':
 
     desc = """test.py"""
@@ -43,6 +47,24 @@ if __name__ == '__main__':
                                     InitialDatum_rho, InitialDatum_A,
                                     speed_ships, nu, dirName, mathcal_K, cut_off_C)
 
+
+    prova = ff(simul_pirates.x_mesh - 5., simul_pirates.y_mesh- 10.)
+
+    grad_py, grad_px = numpy.gradient(prova, simul_pirates.dy, simul_pirates.dx)
+
+    print numpy.amax(grad_py)
+
+    f1 = matplotlib.pyplot.figure(1)
+
+    matplotlib.pyplot.contourf(simul_pirates.x_mesh, simul_pirates.y_mesh, grad_py, 100)
+    matplotlib.pyplot.colorbar()
+    
+    matplotlib.pyplot.show(f1)
+    matplotlib.pyplot.close(f1)
+
+    
+    exit(1)
+    
     x1 = simul_pirates.x - (simul_pirates.x_1 + simul_pirates.x_2)/2.
     y1 = simul_pirates.y - (simul_pirates.y_1 + simul_pirates.y_2)/2.
     
@@ -82,3 +104,5 @@ if __name__ == '__main__':
     
     matplotlib.pyplot.show(f2)
     matplotlib.pyplot.close(f2)
+
+
