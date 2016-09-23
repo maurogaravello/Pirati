@@ -6,10 +6,10 @@ import pde
 import ode
 
 #
-# function for solving the system 
+# function for solving the system in a one temporal step 
 # 
 def one_step_evolution(p_density, s_density, police, xx, yy,
-                       p_kernel, f1, f2, dx, dy, dt):
+                       p_kernel, cut_off, dx, dy, dt):
     """
     This function performs a one time step evolution for the whole system
 
@@ -22,21 +22,17 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
                and s_density
     :param p_kernel: numpy 2d array describing the kernel in the equation for
                      pirates. Same shape as p_density
-   
-
-
-
-    :param f1: float. 
-    :param f2: function of x and y. It returns a 2d array of the same shape of u
+    :param cut_off: cut_off function.
     :param dx: float. The size of the x-mesh
     :param dy: float. The size of the y-mesh
     :param dt: float. The time step. It should satisfy a stability condition
 
+    The output is a tuple (p_new, s_new, police_new) of three elements.
     :output p_new: numpy 2d array of the same shape as p_density
                    describing the density of pirates at time t + dt
     :output s_new: numpy 2d array of the same shape as s_density
                    describing the density of ships at time t + dt
-    :output police_new: 
+    :output police_new: list of final position of police vessels
     """
     # some checks
     shape_p_density = numpy.shape(p_density)
@@ -45,6 +41,11 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
     assert (shape_p_density == numpy.shape(yy))
     assert (shape_p_density == numpy.shape(yy))
 
+    # Calculus of common terms ?
+    police_sum_x = sum(i[0] for i in police)
+    police_sum_y = sum(i[1] for i in police)
+    M = len(police)
+    
     ################################
     # Evolution of pirate density
     ################################
@@ -67,22 +68,85 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
     # term depending on the police
     f = numpy.zeros_like(xx)
     for i in xrange(len(police)):
-        f += cut_off(xx - police[i][0], yy - police[i][1])
-    
+        f += a[i] * cut_off(xx - police[i][0], yy - police[i][1])
 
-    p_new = pde.one_step_parabolic(p_density, xx, yy, div,...., f, dx, dy, dt)
+
+    p_new = pde.one_step_parabolic(p_density, xx, yy, div, -f, dx, dy, dt)
 
     ################################
     # Evolution of ship density
     ################################
 
+    # 2d convolution on a fixed mesh
+    # h * k [n, m] = dx * dy * convolve2d(h, k)
+    cal_I1_x = - dx * dy * scipy.signal.convolve2d(p_density, xx * cut_off(xx, yy), mode='same')
+    cal_I1_y = - dx * dy * scipy.signal.convolve2d(p_density, yy * cut_off(xx, yy), mode='same')
 
-    s_new = pde.one_step_hyperbolic(s_density, .........)
+    cal_I2_x = numpy.zeros_like(xx)
+    cal_I2_y = numpy.zeros_like(xx)
+    for i in xrange(len(police)):
+        cal_I2_x += cut_off(xx - police[i][0], yy - police[i][1]) * (police[i][0] - xx)
+        cal_I2_y += cut_off(xx - police[i][0], yy - police[i][1]) * (police[i][1] - yy)
+
+    cal_I_x = cal_I1_x + cal_I2_x
+    cal_I_y = cal_I1_y + cal_I2_y
+    s_new = pde.one_step_hyperbolic(s_density, velocity, cal_I_x, cal_I_y, dx, dy, dt)
 
 
     ################################
     # Evolution of police position
     ################################
-    
-    police_new = ode.ode(.....)
 
+    police_new = []
+    for i in xrange(len(police)):
+        temp = cut_off(xx - police[i][0], yy - police[i][1]) 
+        F1_x = dx * dy * scipy.signal.convolve2d(p_density * s_density, -temp * (xx - police[i][0]), mode = 'same')
+        F1_y = dx * dy * scipy.signal.convolve2d(p_density * s_density, -temp * (yy - police[i][1]), mode = 'same')
+
+        F2_x = police_sum_x - M * police[i][0]
+        F2_y = police_sum_y - M * police[i][1]
+
+        F3_x = control_x
+        F3_y = control_y
+        
+        police_new.append(ode.ode(F1_x + F2_x + F3_x, F1_y + F2_y + F3_y, police[i], dt))
+
+
+
+    return (p_new, s_new, police_new)
+
+
+
+
+#
+# function for solving the system
+# 
+# def evolution(p_density, s_density, police, xx, yy,
+#                        p_kernel, cut_off, dx, dy, dt):
+def evolution(pirates):
+    """
+    This function performs a one time step evolution for the whole system
+
+    :param p_density: numpy 2d array describing the density of pirates at time t
+    :param s_density: numpy 2d array describing the density of ships at time t
+    :param police: list containing the position of police
+    :param xx: numpy 2d array describing the x-mesh. Same shape as p_density
+               and s_density
+    :param yy: numpy 2d array describing the y-mesh. Same shape as p_density
+               and s_density
+    :param p_kernel: numpy 2d array describing the kernel in the equation for
+                     pirates. Same shape as p_density
+    :param cut_off: cut_off function.
+    :param dx: float. The size of the x-mesh
+    :param dy: float. The size of the y-mesh
+    :param dt: float. The time step. It should satisfy a stability condition
+
+    The output is a tuple (p_new, s_new, police_new) of three elements.
+    :output p_new: numpy 2d array of the same shape as p_density
+                   describing the density of pirates at time t + dt
+    :output s_new: numpy 2d array of the same shape as s_density
+                   describing the density of ships at time t + dt
+    :output police_new: list of final position of police vessels
+    """
+
+    

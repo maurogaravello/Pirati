@@ -51,7 +51,7 @@ def InitialDatum_A (x, y):
 d_o = [(5., 11.), (2., 10.), (7., 10.)] 
 
 ######################################################
-## EQUATION FOR rho
+## EQUATION FOR rho (pirates)
 ######################################################
 def kappa(x):
     eps = 0.2
@@ -63,6 +63,8 @@ def kappa(x):
     else:
         return v_max*(x - eps)/(1 - eps)
 
+# coefficients a_i for definition of f (len = M)
+a = [1., 1.5, 2.] 
 
 ######################################################
 ## EQUATION FOR A

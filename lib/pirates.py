@@ -10,7 +10,7 @@ class pirates(object):
 
     def __init__(self, x_1, x_2, y_1, y_2, n_x, n_y, M, tMax, d_o,
                  InitialDatum_rho, InitialDatum_A, speed_ships, nu, DirName,
-                 mathcal_K, cut_off_C, kappa):
+                 mathcal_K, cut_off_C, kappa, pictures = 90):
         """
         Initializatium function for the class.
         :param x_1: float. Lower bound for x-coordinate of the domain
@@ -41,6 +41,7 @@ class pirates(object):
                           and in the term for police
         :param kappa: function. It gives the normalization for the
                       direction in the equation for pirates
+        :param pictures: int. Approximate number of pictures.
         """
 
         # 2d domains
@@ -62,13 +63,18 @@ class pirates(object):
         self.police_initial_positions = d_o
         self.check_positions()
 
-        # time 
-        self.time_of_simulation = tMax
-        self.dt = np.array([0.])
 
         # ships' velocity
         self.ships_speed = speed_ships
         self.ships_direction = nu
+
+        # time 
+        self.time_of_simulation = tMax
+        self.create_time_mesh()
+
+        # printing mesh
+        self.pictures = 
+        self.create_print_mesh()
 
         # base directory
         self.base_directory = DirName
@@ -80,8 +86,9 @@ class pirates(object):
 
         # normalization function kappa
         self.kappa = kappa
+        
     #
-    # Function for creating the meshes
+    # Function for creating the space mesh
     #
     def create_mesh(self):
         """
@@ -103,6 +110,42 @@ class pirates(object):
         (self.y, self.dy) = np.linspace(self.y_1, self.y_2, self.n_y, retstep=True)
         self.x_mesh, self.y_mesh = np.meshgrid(self.x, self.y)
 
+
+    #
+    # Function for creating the time mesh
+    #
+    def create_time_mesh(self):
+        """
+        This function creates the time mesh.
+        
+        self.time = numpy vector starting from 0, ending to self.time_of_simulation
+        self.dt = the time step
+
+        """
+        dxy = min(self.dx, self.dy)
+        dt = 0.25* min(dxy**2, dxy/self.ships_speed(0))
+        N = 1 + int(self.time_of_simulation / dt)
+        (self.time, self.dt) = np.linspace(0., self.time_of_simulation, N, retstep = True)
+        assert (self.dt <= dt)
+
+
+    #
+    # Function for creating the printing mesh
+    #
+    def create_print_mesh(self):
+        """
+        This function creates the print mesh.
+        
+        self.time = numpy vector starting from 0, ending to self.time_of_simulation
+        self.dt = the time step
+
+        """
+        K = min(int(float(len(self.time))/self.pictures), 90)
+        self.printing = np.zeros_like(self.time, dtype= bool)
+        self.printing[::K] = True
+        self.printing[-1] = True
+
+        
     #
     # Function for creating the kernels
     #
