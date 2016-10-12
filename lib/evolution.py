@@ -9,7 +9,7 @@ import ode
 # function for solving the system in a one temporal step 
 # 
 def one_step_evolution(p_density, s_density, police, xx, yy,
-                       p_kernel, cut_off, dx, dy, dt):
+                       p_kernel, cut_off, dx, dy, dt, kappa, a):
     """
     This function performs a one time step evolution for the whole system
 
@@ -26,6 +26,8 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
     :param dx: float. The size of the x-mesh
     :param dy: float. The size of the y-mesh
     :param dt: float. The time step. It should satisfy a stability condition
+    :param kappa: function. It takes a numpy array and returns an arry of the same shape. It is the normalized function in the equation for pirates
+    :param a: array of floats. Coefficients a for the source term f in the equation for pirates.
 
     The output is a tuple (p_new, s_new, police_new) of three elements.
     :output p_new: numpy 2d array of the same shape as p_density
@@ -68,6 +70,7 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
     # term depending on the police
     f = numpy.zeros_like(xx)
     for i in xrange(len(police)):
+        print numpy.shape(xx - police[i][0]), numpy.shape(yy - police[i][1])
         f += a[i] * cut_off(xx - police[i][0], yy - police[i][1])
 
 
@@ -125,21 +128,9 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
 #                        p_kernel, cut_off, dx, dy, dt):
 def evolution(pirates):
     """
-    This function performs a one time step evolution for the whole system
+    This function performs the evolution for the whole system
 
-    :param p_density: numpy 2d array describing the density of pirates at time t
-    :param s_density: numpy 2d array describing the density of ships at time t
-    :param police: list containing the position of police
-    :param xx: numpy 2d array describing the x-mesh. Same shape as p_density
-               and s_density
-    :param yy: numpy 2d array describing the y-mesh. Same shape as p_density
-               and s_density
-    :param p_kernel: numpy 2d array describing the kernel in the equation for
-                     pirates. Same shape as p_density
-    :param cut_off: cut_off function.
-    :param dx: float. The size of the x-mesh
-    :param dy: float. The size of the y-mesh
-    :param dt: float. The time step. It should satisfy a stability condition
+    :param pirates: pirate class
 
     The output is a tuple (p_new, s_new, police_new) of three elements.
     :output p_new: numpy 2d array of the same shape as p_density
@@ -149,4 +140,19 @@ def evolution(pirates):
     :output police_new: list of final position of police vessels
     """
 
+    p_density = pirates.initial_density_pirates
+    s_density = pirates.initial_density_ships
+    police = pirates.police_initial_positions
     
+    for i in xrange(1, len(pirates.time)):
+
+        # evolution from t to t + dt
+        (p_density, s_density, police) = one_step_evolution(p_density, s_density, police, pirates.x_mesh, pirates.y_mesh,
+                                                            pirates.kernel_mathcal_K, pirates.kernel_cut_off_C, pirates.dx, pirates.dy, pirates.dt, pirates.kappa, pirates.a)
+
+        # printing
+        if pirates.printing[i]:
+            pass
+        
+
+        

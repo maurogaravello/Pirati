@@ -10,7 +10,7 @@ class pirates(object):
 
     def __init__(self, x_1, x_2, y_1, y_2, n_x, n_y, M, tMax, d_o,
                  InitialDatum_rho, InitialDatum_A, speed_ships, nu, DirName,
-                 mathcal_K, cut_off_C, kappa, pictures = 90):
+                 mathcal_K, cut_off_C, kappa, a, pictures = 90):
         """
         Initializatium function for the class.
         :param x_1: float. Lower bound for x-coordinate of the domain
@@ -41,6 +41,7 @@ class pirates(object):
                           and in the term for police
         :param kappa: function. It gives the normalization for the
                       direction in the equation for pirates
+        :param a: array of floats. Coefficients a in the source term f for the eq
         :param pictures: int. Approximate number of pictures.
         """
 
@@ -73,7 +74,7 @@ class pirates(object):
         self.create_time_mesh()
 
         # printing mesh
-        self.pictures = 
+        self.pictures = pictures
         self.create_print_mesh()
 
         # base directory
@@ -86,6 +87,9 @@ class pirates(object):
 
         # normalization function kappa
         self.kappa = kappa
+
+        # coefficient a for the source term f in the equation for pirates
+        self.a = a
         
     #
     # Function for creating the space mesh
@@ -124,7 +128,7 @@ class pirates(object):
         """
         dxy = min(self.dx, self.dy)
         dt = 0.25* min(dxy**2, dxy/self.ships_speed(0))
-        N = 1 + int(self.time_of_simulation / dt)
+        N = 2 + int(self.time_of_simulation / dt)
         (self.time, self.dt) = np.linspace(0., self.time_of_simulation, N, retstep = True)
         assert (self.dt <= dt)
 
@@ -167,7 +171,7 @@ class pirates(object):
         self.kernel_x = self.x - (self.x_1 + self.x_2)/2.
         self.kernel_y = self.y - (self.y_1 + self.y_2)/2.
         self.kernel_mathcal_K = self.mathcal_K(self.kernel_x, self.kernel_y)
-        self.kernel_cut_off_C = self.cut_off_C(self.kernel_x, self.kernel_y)
+        #self.kernel_cut_off_C = self.cut_off_C(self.kernel_x, self.kernel_y)
         
     #
     # Function for creating 2d vectors for intial data

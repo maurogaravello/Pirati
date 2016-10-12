@@ -15,6 +15,7 @@ path = os.path.join(os.getcwd(), "lib")
 sys.path.insert(0, path)
 
 import pirates
+import evolution
 
 if __name__ == '__main__':
 
@@ -45,6 +46,6 @@ if __name__ == '__main__':
     
     simul_pirates = pirates.pirates(x_1, x_2, y_1, y_2, n_x, n_y, M, tMax, d_o,
                                     InitialDatum_rho, InitialDatum_A,
-                                    speed_ships, nu)
+                                    speed_ships, nu, dirName, mathcal_K, cut_off_C, kappa, a)
 
-
+    evolution.evolution(simul_pirates)

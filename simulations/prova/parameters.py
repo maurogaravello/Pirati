@@ -56,12 +56,12 @@ d_o = [(5., 11.), (2., 10.), (7., 10.)]
 def kappa(x):
     eps = 0.2
     v_max = 1.
-    if x <= eps:
-        return 0.
-    elif x >= 1.:
-        return v_max/x
-    else:
-        return v_max*(x - eps)/(1 - eps)
+
+    A1 = numpy.zeros_like(x)
+    A2 = v_max * (x >= 1) / x
+    A3 = v_max * numpy.logical_and(x > eps, x < 1) * (x - eps) / (1 - eps)
+    
+    return A1 + A2 + A3
 
 # coefficients a_i for definition of f (len = M)
 a = [1., 1.5, 2.] 
@@ -104,10 +104,16 @@ def mathcal_K(x, y):
     return std_moll(x, y, radius)
 
 
-# cut-off C
-def cut_off_C(x, y):
-    radius = .4
-    return std_moll(x, y, radius)
+# cut-off C (function)
+def cut_off_C(x, y, radius = .4):
+    # x and y are meshes!
+    
+    k = (x**2 + y**2 < radius**2) * (radius**2 - x**2 - y**2)
+    #print x[0,:]
+    #C = numpy.trapz(numpy.trapz(k, x[0,:]), y)
+    #return k / C
+
+    #return std_moll(x, y, radius)
 
 
 
