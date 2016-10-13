@@ -4,12 +4,14 @@ import numpy
 import scipy.signal
 import pde
 import ode
+import save
 
 #
 # function for solving the system in a one temporal step 
 # 
 def one_step_evolution(p_density, s_density, police, xx, yy,
-                       p_kernel, cut_off, dx, dy, dt, kappa, a):
+                       p_kernel, cut_off, dx, dy, dt, kappa, a,
+                       velocity):
     """
     This function performs a one time step evolution for the whole system
 
@@ -28,6 +30,7 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
     :param dt: float. The time step. It should satisfy a stability condition
     :param kappa: function. It takes a numpy array and returns an arry of the same shape. It is the normalized function in the equation for pirates
     :param a: array of floats. Coefficients a for the source term f in the equation for pirates.
+    :param velocity: function describing the speed of the ship.
 
     The output is a tuple (p_new, s_new, police_new) of three elements.
     :output p_new: numpy 2d array of the same shape as p_density
@@ -70,7 +73,6 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
     # term depending on the police
     f = numpy.zeros_like(xx)
     for i in xrange(len(police)):
-        print numpy.shape(xx - police[i][0]), numpy.shape(yy - police[i][1])
         f += a[i] * cut_off(xx - police[i][0], yy - police[i][1])
 
 
@@ -109,8 +111,8 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
         F2_x = police_sum_x - M * police[i][0]
         F2_y = police_sum_y - M * police[i][1]
 
-        F3_x = control_x
-        F3_y = control_y
+        F3_x = numpy.zeros_like(F2_x)   #control_x
+        F3_y = numpy.zeros_like(F2_y)   #control_y
         
         police_new.append(ode.ode(F1_x + F2_x + F3_x, F1_y + F2_y + F3_y, police[i], dt))
 
@@ -143,16 +145,18 @@ def evolution(pirates):
     p_density = pirates.initial_density_pirates
     s_density = pirates.initial_density_ships
     police = pirates.police_initial_positions
-    
+
+    print_number = 1
     for i in xrange(1, len(pirates.time)):
 
         # evolution from t to t + dt
         (p_density, s_density, police) = one_step_evolution(p_density, s_density, police, pirates.x_mesh, pirates.y_mesh,
-                                                            pirates.kernel_mathcal_K, pirates.kernel_cut_off_C, pirates.dx, pirates.dy, pirates.dt, pirates.kappa, pirates.a)
+                                                            pirates.kernel_mathcal_K, pirates.cut_off_C, pirates.dx, pirates.dy, pirates.dt, pirates.kappa, pirates.a, pirates.ships_speed)
 
         # printing
         if pirates.printing[i]:
-            pass
+            name = 'saving_' + str(print_number).zfill(4)
+            save.solution_Save(pirates.base_directory, name, pirates.time[i], p_density, s_density, police)
         
 
         

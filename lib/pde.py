@@ -18,7 +18,7 @@ def one_step_parabolic(u, x, y, f1, f2, dx, dy, dt):
     :param x: numpy 2d array describing the x-mesh. Same shape as u
     :param y: numpy 2d array describing the y-mesh. Same shape as u
     :param f1: float. 
-    :param f2: function of x and y. It returns a 2d array of the same shape of u
+    :param f2: numpy 2d array of the same shape of u
     :param dx: float. The size of the x-mesh
     :param dy: float. The size of the y-mesh
     :param dt: float. The time step. It should satisfy a stability condition
@@ -37,7 +37,7 @@ def one_step_parabolic(u, x, y, f1, f2, dx, dy, dt):
     u_xx = (1. / (dx**2)) * (u[1:-1, 2:] + u[1:-1, :-2] - 2 * u[1:-1, 1:-1])
     u_yy = (1. / (dy**2)) * (u[2:, 1:-1] + u[:-2, 1:-1] - 2 * u[1:-1, 1:-1])
 
-    u_new = u[1:-1, 1:-1] + dt * (u_xx + u_yy + f1 + f2(x, y) * u[1:-1, 1:-1])
+    u_new = u[1:-1, 1:-1] + dt * (u_xx + u_yy + f1 + f2 * u[1:-1, 1:-1])
 
     return u_new
 
@@ -71,15 +71,13 @@ def one_step_hyperbolic(A, v, w_x, w_y, dx, dy, dt):
                    time t + dt
 
     """
-    assert (numpy.shape(A) == numpy.shape(x))
-    assert (numpy.shape(A) == numpy.shape(y))
 
-    A = augment(A)
 
     # Calculate the numerical flux divergence
     
     f = augment(A * v(A) * w_x)
     g = augment(A * v(A) * w_y)
+    A = augment(A)
     
     f_x = (1. / (2. * dx)) * (f[1:-1, 2:] - f[1:-1, :-2])
     g_y = (1. / (2. * dy)) * (g[2:, 1:-1] - g[:-2, 1:-1])

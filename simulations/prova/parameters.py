@@ -19,40 +19,22 @@ y_2 = 20. # maximum value for y
 n_x = 200 # integer
 n_y = 100 # integer
 
-######################################################
-## Number M of police vessels
-######################################################
-
-M = 3 # integer number
 
 ######################################################
-## TIME
+## TIME of simulation
 ######################################################
 
 tMax = 10. # time of simulation
 
 ######################################################
-## INITIAL DATA
+## EQUATION FOR rho (pirates)
 ######################################################
 
 # Initial Datum for rho (density of piracy)
 def InitialDatum_rho (x, y):
     return x*y
 
-# Initial Datum for A (density of ships)
-def InitialDatum_A (x, y):
-    A1 = numpy.logical_and(2 <= x, x <=4) * numpy.ones_like(x) * numpy.logical_and(2 <= y, y <=4) * numpy.ones_like(y)
-    A2 = numpy.logical_and(2 <= x, x <=4) * numpy.ones_like(x) * numpy.logical_and(8 <= y, y <=12) * numpy.ones_like(y)
-    return A1 + A2
-
-# Initial Datum for police vessels
-# d_o -> list of size M
-# each element is a tuple with 2 elements
-d_o = [(5., 11.), (2., 10.), (7., 10.)] 
-
-######################################################
-## EQUATION FOR rho (pirates)
-######################################################
+# normalization function kappa
 def kappa(x):
     eps = 0.2
     v_max = 1.
@@ -66,9 +48,16 @@ def kappa(x):
 # coefficients a_i for definition of f (len = M)
 a = [1., 1.5, 2.] 
 
+
 ######################################################
-## EQUATION FOR A
+## EQUATION FOR A (ships)
 ######################################################
+
+# Initial Datum for A (density of ships)
+def InitialDatum_A (x, y):
+    A1 = numpy.logical_and(2 <= x, x <=4) * numpy.ones_like(x) * numpy.logical_and(2 <= y, y <=4) * numpy.ones_like(y)
+    A2 = numpy.logical_and(2 <= x, x <=4) * numpy.ones_like(x) * numpy.logical_and(8 <= y, y <=12) * numpy.ones_like(y)
+    return A1 + A2
 
 # speed of ships
 def speed_ships(A):
@@ -83,6 +72,20 @@ def nu(x,y):
     nu_y = numpy.zeros_like(x_mesh + y_mesh)
 
     return (nu_x, nu_y)
+
+
+######################################################
+## EQUATION FOR d (police vessels)
+######################################################
+
+# Number M of police vessels
+M = 3 # integer number
+
+# Initial Datum for police vessels
+# d_o -> list of size M
+# each element is a tuple with 2 elements
+d_o = [(5., 11.), (2., 10.), (7., 10.)] 
+
 
 
 #######################################################
@@ -109,11 +112,12 @@ def cut_off_C(x, y, radius = .4):
     # x and y are meshes!
     
     k = (x**2 + y**2 < radius**2) * (radius**2 - x**2 - y**2)
-    #print x[0,:]
-    #C = numpy.trapz(numpy.trapz(k, x[0,:]), y)
-    #return k / C
+    C = numpy.sum(k) * (x[0][1] - x[0][0]) * (y[1][0] - y[0][0])
 
-    #return std_moll(x, y, radius)
+    if C < 0.3:
+        return k
+
+    return k/C
 
 
 
