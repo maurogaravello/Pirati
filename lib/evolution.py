@@ -157,6 +157,6 @@ def evolution(pirates):
         if pirates.printing[i]:
             name = 'saving_' + str(print_number).zfill(4)
             save.solution_Save(pirates.base_directory, name, pirates.time[i], p_density, s_density, police)
-        
+            print_number += 1
 
         
