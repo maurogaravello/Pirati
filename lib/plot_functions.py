@@ -127,3 +127,47 @@ def plt_kernels(pirates, x, y, h_p = 50, v_p = 50, levels = 50):
     matplotlib.pyplot.savefig(full_name)
     matplotlib.pyplot.close(vf)
     
+
+#
+# plot the solutions
+#
+def plt_solutions(pirates, levels = 10):
+
+    dirName = pirates.base_directory
+    
+    list_files = glob.glob(os.path.join(dirName, 'saving*.npz'))
+    list_files.sort()
+
+    # pirates' and ships pictures
+    for FileName in list_files:
+        name = '_plot' + os.path.splitext(FileName)[0][1:][-5:] + '.png'
+        pirate_file = 'pirates' + name
+        ship_file = 'ships' + name
+
+        # read the file
+        npzf = numpy.load(FileName)
+        t = npzf['t']
+        p_density = npzf['r']
+        s_density = npzf['A']
+        police = npzf['d']
+        npzf.close()
+
+
+        # contour plot of density of pirates
+        plt_contour(pirates.x, pirates.y, p_density, 'Pirates density at time t=' + str(t), pirate_file, dirName, pirates.police_initial_positions, levels)
+
+        # contour plot of inital density of ships
+        plt_contour(pirates.x, pirates.y, s_density, 'Ships density at time t=' + str(t), ship_file, dirName, pirates.police_initial_positions, levels)
+
+#
+# final movie
+#
+def movie(pirates):
+    pirate = os.path.join(pirates.base_directory, 'pirates_plot*')
+    movie_p = os.path.join(pirates.base_directory, 'movie_pirates.mpg')
+    ship = os.path.join(pirates.base_directory, 'ships_plot*')
+    movie_s = os.path.join(pirates.base_directory, 'movie_ships.mpg')
+    
+    # os.system("mencoder 'mf://'" + DirName +"'/JSR*.png' -mf type=png:fps=5 -ovc lavc -lavcopts vcodec=wmv2 -oac copy -o " + dirName2 + "/film.mpg")
+    os.system("mencoder 'mf://'" + pirate + " -mf type=png:fps=5 -ovc lavc -lavcopts vcodec=wmv2 -oac copy -o " + movie_p)
+    os.system("mencoder 'mf://'" + ship + " -mf type=png:fps=5 -ovc lavc -lavcopts vcodec=wmv2 -oac copy -o " + movie_s)

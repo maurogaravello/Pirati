@@ -48,6 +48,8 @@ if __name__ == '__main__':
     
     parser.add_argument('-p', '--processors', type = check_negative, help="Enter the number of working processors", default = 1)
 
+    # complete solution and movie
+    parser.add_argument('-s', '--solution', dest = 'solution', action = 'store_true', help = 'Plot the complete solution and the movie')
        
     args = parser.parse_args()
     
@@ -73,7 +75,7 @@ if __name__ == '__main__':
     
     simul_pirates = pirates.pirates(x_1, x_2, y_1, y_2, n_x, n_y, M, tMax, d_o,
                                     InitialDatum_rho, InitialDatum_A,
-                                    speed_ships, nu, dirName, mathcal_K, cut_off_C)
+                                    speed_ships, nu, dirName, mathcal_K, cut_off_C, kappa, a)
 
 
     if args.init_data:
@@ -88,3 +90,8 @@ if __name__ == '__main__':
         y = numpy.linspace(-1.5,1.5,50)
         
         plt.plt_kernels(simul_pirates, x, y, 100, 100)
+
+
+    if args.solution:
+        plt.plt_solutions(simul_pirates, args.levels_color)
+        plt.movie(simul_pirates)
