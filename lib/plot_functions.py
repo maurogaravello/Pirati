@@ -138,6 +138,12 @@ def plt_solutions(pirates, levels = 10):
     list_files = glob.glob(os.path.join(dirName, 'saving*.npz'))
     list_files.sort()
 
+    # plotting initial conditions
+    plt_contour(pirates.x, pirates.y, pirates.initial_density_pirates, 'Pirates density at time t=0', 'pirates_plot_0000.png', pirates.base_directory, pirates.police_initial_positions, levels)
+    plt_contour(pirates.x, pirates.y, pirates.initial_density_ships, 'Ships density at time t=0', 'ships_plot_0000.png', pirates.base_directory, pirates.police_initial_positions, levels)
+
+
+    
     # pirates' and ships pictures
     for FileName in list_files:
         name = '_plot' + os.path.splitext(FileName)[0][1:][-5:] + '.png'
@@ -168,6 +174,5 @@ def movie(pirates):
     ship = os.path.join(pirates.base_directory, 'ships_plot*')
     movie_s = os.path.join(pirates.base_directory, 'movie_ships.mpg')
     
-    # os.system("mencoder 'mf://'" + DirName +"'/JSR*.png' -mf type=png:fps=5 -ovc lavc -lavcopts vcodec=wmv2 -oac copy -o " + dirName2 + "/film.mpg")
     os.system("mencoder 'mf://'" + pirate + " -mf type=png:fps=5 -ovc lavc -lavcopts vcodec=wmv2 -oac copy -o " + movie_p)
     os.system("mencoder 'mf://'" + ship + " -mf type=png:fps=5 -ovc lavc -lavcopts vcodec=wmv2 -oac copy -o " + movie_s)
