@@ -104,15 +104,18 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
 
     police_new = []
     for i in xrange(len(police)):
-        temp = cut_off(xx - police[i][0], yy - police[i][1]) 
-        F1_x = dx * dy * scipy.signal.convolve2d(p_density * s_density, -temp * (xx - police[i][0]), mode = 'same')
-        F1_y = dx * dy * scipy.signal.convolve2d(p_density * s_density, -temp * (yy - police[i][1]), mode = 'same')
+        temp = cut_off(police[i][0] - xx, police[i][1] - yy) * p_density * s_density
+        F1_x = dx * dy * numpy.sum(temp * (xx - police[i][0]))
+        F1_y = dx * dy * numpy.sum(temp * (yy - police[i][1]))
+
+        # F1_x = dx * dy * scipy.signal.convolve2d(p_density * s_density, -temp * (xx - police[i][0]), mode = 'same')
+        # F1_y = dx * dy * scipy.signal.convolve2d(p_density * s_density, -temp * (yy - police[i][1]), mode = 'same')
 
         F2_x = police_sum_x - M * police[i][0]
         F2_y = police_sum_y - M * police[i][1]
 
-        F3_x = numpy.zeros_like(F2_x)   #control_x
-        F3_y = numpy.zeros_like(F2_y)   #control_y
+        F3_x = 0.   #control_x
+        F3_y = 0.   #control_y
         
         police_new.append(ode.ode(F1_x + F2_x + F3_x, F1_y + F2_y + F3_y, police[i], dt))
 
@@ -154,8 +157,8 @@ def evolution(pirates):
                                                             pirates.kernel_mathcal_K, pirates.cut_off_C, pirates.dx, pirates.dy, pirates.dt, pirates.kappa, pirates.a, pirates.ships_speed)
 
         # printing
-        #if pirates.printing[i]:
-        if True:
+        if pirates.printing[i]:
+            # if True:
             name = 'saving_' + str(print_number).zfill(4)
             save.solution_Save(pirates.base_directory, name, pirates.time[i], p_density, s_density, police)
             print_number += 1
