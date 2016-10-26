@@ -39,11 +39,11 @@ def kappa(x):
     eps = 0.2
     v_max = 1.
 
-    A1 = numpy.zeros_like(x)
-    A2 = v_max * (x >= 1) / x
+    A1 = (x >= 1) * x + (x < 1) * 1
+    A2 = v_max * (x < 1) * 0 / A1
     A3 = v_max * numpy.logical_and(x > eps, x < 1) * (x - eps) / (1 - eps)
     
-    return A1 + A2 + A3
+    return A2 + A3
 
 # coefficients a_i for definition of f (len = M)
 a = [1., 1.5, 2.] 
