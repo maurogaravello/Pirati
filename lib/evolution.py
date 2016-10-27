@@ -11,7 +11,7 @@ import save
 # 
 def one_step_evolution(p_density, s_density, police, xx, yy,
                        p_kernel, cut_off, dx, dy, dt, kappa, a,
-                       velocity):
+                       velocity, nu_x, nu_y):
     """
     This function performs a one time step evolution for the whole system
 
@@ -31,6 +31,8 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
     :param kappa: function. It takes a numpy array and returns an arry of the same shape. It is the normalized function in the equation for pirates
     :param a: array of floats. Coefficients a for the source term f in the equation for pirates.
     :param velocity: function describing the speed of the ship.
+    :param nu_x: x-direction of the geometric component of nu
+    :param nu_y: x-direction of the geometric component of nu
 
     The output is a tuple (p_new, s_new, police_new) of three elements.
     :output p_new: numpy 2d array of the same shape as p_density
@@ -95,7 +97,9 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
 
     cal_I_x = cal_I1_x + cal_I2_x
     cal_I_y = cal_I1_y + cal_I2_y
-    s_new = pde.one_step_hyperbolic(s_density, velocity, cal_I_x, cal_I_y, dx, dy, dt)
+    vel_x = cal_I_x + nu_x
+    vel_y = cal_I_y + nu_y
+    s_new = pde.one_step_hyperbolic(s_density, velocity, vel_x, vel_y, dx, dy, dt)
 
 
     ################################
@@ -154,7 +158,7 @@ def evolution(pirates):
 
         # evolution from t to t + dt
         (p_density, s_density, police) = one_step_evolution(p_density, s_density, police, pirates.x_mesh, pirates.y_mesh,
-                                                            pirates.kernel_mathcal_K, pirates.cut_off_C, pirates.dx, pirates.dy, pirates.dt, pirates.kappa, pirates.a, pirates.ships_speed)
+                                                            pirates.kernel_mathcal_K, pirates.cut_off_C, pirates.dx, pirates.dy, pirates.dt, pirates.kappa, pirates.a, pirates.ships_speed, pirates.ships_direction(pirates.x, pirates.y)[0], pirates.ships_direction(pirates.x, pirates.y)[1])
 
         # printing
         if pirates.printing[i]:

@@ -49,3 +49,5 @@ if __name__ == '__main__':
                                     speed_ships, nu, dirName, mathcal_K, cut_off_C, kappa, a)
 
     evolution.evolution(simul_pirates)
+
+    logging.info('Finished  at ' + str(datetime.now()))
