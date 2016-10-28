@@ -97,8 +97,10 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
 
     cal_I_x = cal_I1_x + cal_I2_x
     cal_I_y = cal_I1_y + cal_I2_y
-    vel_x = cal_I_x + nu_x
-    vel_y = cal_I_y + nu_y
+    # vel_x = cal_I_x + nu_x
+    # vel_y = cal_I_y + nu_y
+    vel_x = nu_x
+    vel_y = nu_y
     s_new = pde.one_step_hyperbolic(s_density, velocity, vel_x, vel_y, dx, dy, dt)
 
 
@@ -158,11 +160,11 @@ def evolution(pirates):
 
         # evolution from t to t + dt
         (p_density, s_density, police) = one_step_evolution(p_density, s_density, police, pirates.x_mesh, pirates.y_mesh,
-                                                            pirates.kernel_mathcal_K, pirates.cut_off_C, pirates.dx, pirates.dy, pirates.dt, pirates.kappa, pirates.a, pirates.ships_speed, pirates.ships_direction(pirates.x, pirates.y)[0], pirates.ships_direction(pirates.x, pirates.y)[1])
+                                                            pirates.kernel_mathcal_K, pirates.cut_off_C, pirates.dx, pirates.dy, pirates.dt, pirates.kappa, pirates.a, pirates.ships_speed, pirates.ships_direction_mesh[0], pirates.ships_direction_mesh[1])
 
         # printing
-        if pirates.printing[i]:
-            # if True:
+        #if pirates.printing[i]:
+        if True:
             name = 'saving_' + str(print_number).zfill(4)
             save.solution_Save(pirates.base_directory, name, pirates.time[i], p_density, s_density, police)
             print_number += 1

@@ -68,7 +68,8 @@ class pirates(object):
         # ships' velocity
         self.ships_speed = speed_ships
         self.ships_direction = nu
-
+        self.ships_direction_mesh = nu(self.x, self.y)
+        
         # time 
         self.time_of_simulation = tMax
         self.create_time_mesh()

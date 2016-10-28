@@ -48,8 +48,11 @@ def plt_contour(x, y, function, title, name, dir, police_position, levels=10):
     px = [i[0] for i in police_position]
     py = [i[1] for i in police_position]
 
+    v = numpy.linspace(0., 1.0, 15, endpoint=True)
+    
     # plotting contour with colorbar
-    matplotlib.pyplot.contourf(x, y, function, levels)
+    #    matplotlib.pyplot.contourf(x, y, function, levels)
+    matplotlib.pyplot.contourf(x, y, function, v, cmap=matplotlib.pyplot.cm.jet)
     matplotlib.pyplot.colorbar()
 
     # plotting police positions as white points
@@ -160,10 +163,10 @@ def plt_solutions(pirates, levels = 10):
 
 
         # contour plot of density of pirates
-        plt_contour(pirates.x, pirates.y, p_density, 'Pirates density at time t=' + str(t), pirate_file, dirName, pirates.police_initial_positions, levels)
+        plt_contour(pirates.x, pirates.y, p_density, 'Pirates density at time t=' + str("%.3f" %t), pirate_file, dirName, pirates.police_initial_positions, levels)
 
         # contour plot of inital density of ships
-        plt_contour(pirates.x, pirates.y, s_density, 'Ships density at time t=' + str(t), ship_file, dirName, pirates.police_initial_positions, levels)
+        plt_contour(pirates.x, pirates.y, s_density, 'Ships density at time t=' + str("%.3f" %t), ship_file, dirName, pirates.police_initial_positions, levels)
 
 #
 # final movie
