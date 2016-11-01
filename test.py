@@ -27,12 +27,12 @@ def v(A):
 
 if __name__ == '__main__':
 
-    A = numpy.zeros((4,5))
+    A = numpy.zeros((5,6))
     A[1,2] = .5
     A[2,2] = .5
     
-    w_x = numpy.ones((4,5))
-    w_y = numpy.zeros((4,5))
+    w_x = numpy.ones((5,6))
+    w_y = numpy.zeros((5,6))
     dx = 0.2
     dy = 0.25
     dt = 0.25 * min(dx**2, dx / 1.)

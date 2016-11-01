@@ -48,11 +48,11 @@ def plt_contour(x, y, function, title, name, dir, police_position, levels=10):
     px = [i[0] for i in police_position]
     py = [i[1] for i in police_position]
 
-    v = numpy.linspace(0., 1.0, 15, endpoint=True)
+    v = numpy.linspace(0., 1.0, 35, endpoint=True)
     
     # plotting contour with colorbar
-    #    matplotlib.pyplot.contourf(x, y, function, levels)
-    matplotlib.pyplot.contourf(x, y, function, v, cmap=matplotlib.pyplot.cm.jet)
+    matplotlib.pyplot.contourf(x, y, function, levels)
+    #matplotlib.pyplot.contourf(x, y, function, v, cmap=matplotlib.pyplot.cm.jet)
     matplotlib.pyplot.colorbar()
 
     # plotting police positions as white points

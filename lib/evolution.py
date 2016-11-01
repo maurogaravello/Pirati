@@ -163,8 +163,8 @@ def evolution(pirates):
                                                             pirates.kernel_mathcal_K, pirates.cut_off_C, pirates.dx, pirates.dy, pirates.dt, pirates.kappa, pirates.a, pirates.ships_speed, pirates.ships_direction_mesh[0], pirates.ships_direction_mesh[1])
 
         # printing
-        #if pirates.printing[i]:
-        if True:
+        if pirates.printing[i]:
+        #if True:
             name = 'saving_' + str(print_number).zfill(4)
             save.solution_Save(pirates.base_directory, name, pirates.time[i], p_density, s_density, police)
             print_number += 1

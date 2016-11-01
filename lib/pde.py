@@ -52,7 +52,8 @@ def one_step_hyperbolic(A, v, w_x, w_y, dx, dy, dt):
     """
     This function performs a one time step for the hyperbolic equation
     \partial_t A + div(A v(A) w(x, y)) = 0
-    by a 2D Lax-Friedrics method. It is important that the support of A
+    by a dimensional splitting and a 
+    Lax-Friedrics method. It is important that the support of A
     is strictly contained in the integration domain!!
     
     :param A: numpy 2d array describing the state at time t
@@ -73,20 +74,23 @@ def one_step_hyperbolic(A, v, w_x, w_y, dx, dy, dt):
     """
 
 
-    # Calculate the numerical flux divergence
-    
+
+    # x-split
     f = augment(A * v(A) * w_x)
+    A = augment(A)
+
+    f_x = (1. / (2. * dx)) * (f[1:-1, 2:] - f[1:-1, :-2])
+    A = .5 * (A[1:-1, 2:] + A[1:-1, :-2]) - dt * f_x 
+
+    # y-split
+
     g = augment(A * v(A) * w_y)
     A = augment(A)
     
-    f_x = (1. / (2. * dx)) * (f[1:-1, 2:] - f[1:-1, :-2])
     g_y = (1. / (2. * dy)) * (g[2:, 1:-1] - g[:-2, 1:-1])
+    A = .5 * (A[2:, 1:-1] + A[:-2, 1:-1]) - dt * g_y
 
-    
-    # Calculate the solution at time t + dt
-    A_new = .25 * (A[1:-1, 2:] + A[1:-1, :-2] + A[2:, 1:-1] + A[:-2, 1:-1]) - dt * (f_x + g_y)
-
-    return A_new
+    return A
 
 
 def augment(u):
