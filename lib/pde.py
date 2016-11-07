@@ -115,4 +115,78 @@ def augment(u):
     return u
 
 
+#
+# Godunov_Flux function
+#
+def Godunov_Flux(u, f, pm):
+    """
+    This function calculates the Godunov flux. It returns
+    a numpy array given the Godunov flux. This numpy array has size
+    equal to the size of u minus 1
 
+    :param u: numpy array with two ghost cells. Density of the state
+    :param f: concave flux function.
+    :param pm: float. Point of maximum for the flux 
+  
+    """
+
+    f1 = f(u)
+    mask_sh_pos = (u[:-1] <= u[1:]) & (f1[:-1] <= f1[1:])
+    mask_sh_neg = (u[:-1] <= u[1:]) & (f1[:-1] > f1[1:])
+
+    mask_rar_neg = (u[:-1] > u[1:]) & (u[1:] >= pm)
+    mask_rar_pos = (u[:-1] > u[1:]) & (u[:-1] <= pm)
+
+    mask_pos = mask_sh_pos | mask_rar_pos
+    mask_neg = mask_sh_neg | mask_rar_neg
+    
+    mask_theta = numpy.logical_not(mask_pos | mask_neg)
+
+    return mask_theta * f(pm) + mask_pos * f1[:-1] + \
+           mask_neg * f1[1:]
+
+
+def one_step_hyperbolic(A, v, w_x, w_y, dx, dy, dt):
+    """
+    This function performs a one time step for the hyperbolic equation
+    \partial_t A + div(A v(A) w(x, y)) = 0
+    by a dimensional splitting and a 
+    Godunov-type method.
+    
+    :param A: numpy 2d array describing the state at time t
+    :param x: numpy 2d array describing the x-mesh. Same shape as A
+    :param y: numpy 2d array describing the y-mesh. Same shape as A
+    :param v: function. It gives the speed of ships depending on the density
+    :param w_x: numpy 2d array of the same shape of A
+                describing the x component of w
+    :param w_y: numpy 2d array of the same shape of A
+                describing the y component of w
+    :param dx: float. The size of the x-mesh
+    :param dy: float. The size of the y-mesh
+    :param dt: float. The time step. It should satisfy a stability condition
+
+    :output A_new: numpy 2d array of the same shape as A describing the state at
+                   time t + dt
+
+    """
+
+
+
+    # x-split
+    f = augment(A * v(A) * w_x)
+    A = augment(A)
+
+    
+
+    f_x = (1. / (2. * dx)) * (f[1:-1, 2:] - f[1:-1, :-2])
+    A = A - (dt / dx) * ()
+
+    # y-split
+
+    g = augment(A * v(A) * w_y)
+    A = augment(A)
+    
+    g_y = (1. / (2. * dy)) * (g[2:, 1:-1] - g[:-2, 1:-1])
+    A = .5 * (A[2:, 1:-1] + A[:-2, 1:-1]) - dt * g_y
+
+    return A
