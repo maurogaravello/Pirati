@@ -116,37 +116,77 @@ def augment(u):
 
 
 #
-# Godunov_Flux function
+# Godunov_Flux_x function
 #
-def Godunov_Flux(u, f, pm):
+def Godunov_Flux_x(u, v, pm):
     """
-    This function calculates the Godunov flux. It returns
-    a numpy array given the Godunov flux. This numpy array has size
-    equal to the size of u minus 1
+    This function calculates the Godunov flux for the x-component.
+    It returns a numpy 2d array (the Godunov flux).
+    This numpy 2d array has size
+    equal to the size of u minus 1 in the x-direction
 
-    :param u: numpy array with two ghost cells. Density of the state
-    :param f: concave flux function.
+    :param u: numpy 2d array with two ghost cells.
+    Density of the state
+    :param v: decreasing velocity function. The corresponding flux,
+              i.e. u |---> u v(u), should be strictly concave 
     :param pm: float. Point of maximum for the flux 
-  
     """
 
-    f1 = f(u)
-    mask_sh_pos = (u[:-1] <= u[1:]) & (f1[:-1] <= f1[1:])
-    mask_sh_neg = (u[:-1] <= u[1:]) & (f1[:-1] > f1[1:])
 
-    mask_rar_neg = (u[:-1] > u[1:]) & (u[1:] >= pm)
-    mask_rar_pos = (u[:-1] > u[1:]) & (u[:-1] <= pm)
+    
+    f1 = u * v(u)
+    mask_sh_pos = (u[:, :-1] <= u[:, 1:]) & (f1[:, :-1] <= f1[:, 1:])
+    mask_sh_neg = (u[:, :-1] <= u[:, 1:]) & (f1[:, :-1] > f1[:, 1:])
+
+    mask_rar_neg = (u[:, :-1] > u[:, 1:]) & (u[:, 1:] >= pm)
+    mask_rar_pos = (u[:, :-1] > u[:, 1:]) & (u[:, :-1] <= pm)
 
     mask_pos = mask_sh_pos | mask_rar_pos
     mask_neg = mask_sh_neg | mask_rar_neg
     
     mask_theta = numpy.logical_not(mask_pos | mask_neg)
 
-    return mask_theta * f(pm) + mask_pos * f1[:-1] + \
-           mask_neg * f1[1:]
+    return mask_theta * f(pm) + mask_pos * f1[:, :-1] + \
+           mask_neg * f1[:, 1:]
+
+#
+# Godunov_Flux_y function
+#
+def Godunov_Flux_y(u, v, pm):
+    """
+    This function calculates the Godunov flux for the y-component.
+    It returns a numpy 2d array (the Godunov flux).
+    This numpy 2d array has size
+    equal to the size of u minus 1 in the y-direction
+
+    :param u: numpy 2d array with two ghost cells.
+    Density of the state
+    :param v: decreasing velocity function. The corresponding flux,
+              i.e. u |---> u v(u), should be strictly concave 
+    :param pm: float. Point of maximum for the flux 
+    """
 
 
-def one_step_hyperbolic(A, v, w_x, w_y, dx, dy, dt):
+    
+    f1 = u * v(u)
+    mask_sh_pos = (u[ :-1, :] <= u[1:, :]) & (f1[ :-1, :] <= f1[1:, :])
+    mask_sh_neg = (u[ :-1, :] <= u[1:, :]) & (f1[ :-1, :] > f1[1:, :])
+
+    mask_rar_neg = (u[ :-1, :] > u[1:, :]) & (u[1:, :] >= pm)
+    mask_rar_pos = (u[ :-1, :] > u[1:, :]) & (u[ :-1, :] <= pm)
+
+    mask_pos = mask_sh_pos | mask_rar_pos
+    mask_neg = mask_sh_neg | mask_rar_neg
+    
+    mask_theta = numpy.logical_not(mask_pos | mask_neg)
+
+    return mask_theta * f(pm) + mask_pos * f1[ :-1, :] + \
+           mask_neg * f1[1:, :]
+
+#
+# one_step_hyperbolic_godunov
+#
+def one_step_hyperbolic_godunov(A, v, w_x, w_y, dx, dy, dt):
     """
     This function performs a one time step for the hyperbolic equation
     \partial_t A + div(A v(A) w(x, y)) = 0
@@ -170,23 +210,25 @@ def one_step_hyperbolic(A, v, w_x, w_y, dx, dy, dt):
 
     """
 
-
-
     # x-split
-    f = augment(A * v(A) * w_x)
+    w_x = augment(w_x)
     A = augment(A)
+    w_x = 0.5 * (w_x[:, 1:] + w_x[:, :-1])
+
+    gf = Godunov_Flux_x(A, v, 0.5) * w_x
+
+    A = A[1:-1, 1:-1] - (dt / dx) * (gf[1:-1, :-1] - gf[1:-1, 1:])
 
     
-
-    f_x = (1. / (2. * dx)) * (f[1:-1, 2:] - f[1:-1, :-2])
-    A = A - (dt / dx) * ()
-
     # y-split
 
-    g = augment(A * v(A) * w_y)
+    w_y = augment(w_y)
     A = augment(A)
+    w_y = 0.5 * (w_y[1:, :] + w_y[:-1, :])
+
+    gf = Godunov_Flux_y(A, v, 0.5) * w_y
     
-    g_y = (1. / (2. * dy)) * (g[2:, 1:-1] - g[:-2, 1:-1])
-    A = .5 * (A[2:, 1:-1] + A[:-2, 1:-1]) - dt * g_y
+    
+    A = A[1:-1, 1:-1] - (dt / dy) * (gf[:-1, 1:-1] - gf[1:, 1:-1])
 
     return A
