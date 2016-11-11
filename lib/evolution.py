@@ -97,10 +97,10 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
 
     cal_I_x = cal_I1_x + cal_I2_x
     cal_I_y = cal_I1_y + cal_I2_y
-    # vel_x = cal_I_x + nu_x
-    # vel_y = cal_I_y + nu_y
-    vel_x = nu_x
-    vel_y = nu_y
+    vel_x = cal_I_x + nu_x
+    vel_y = cal_I_y + nu_y
+    # vel_x = nu_x
+    # vel_y = nu_y
     s_new = pde.one_step_hyperbolic(s_density, velocity, vel_x, vel_y, dx, dy, dt)
 
 

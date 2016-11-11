@@ -38,6 +38,6 @@ if __name__ == '__main__':
     dt = 0.25 * min(dx**2, dx / 1.)
     
 
-    A_new = pde.one_step_hyperbolic(A, v, w_x, w_y, dx, dy, dt)
+    A_new = pde.one_step_hyperbolic_godunov(A, v, w_x, w_y, dx, dy, dt)
 
     print A_new

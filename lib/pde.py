@@ -146,7 +146,7 @@ def Godunov_Flux_x(u, v, pm):
     
     mask_theta = numpy.logical_not(mask_pos | mask_neg)
 
-    return mask_theta * f(pm) + mask_pos * f1[:, :-1] + \
+    return mask_theta * pm * v(pm) + mask_pos * f1[:, :-1] + \
            mask_neg * f1[:, 1:]
 
 #
@@ -180,12 +180,13 @@ def Godunov_Flux_y(u, v, pm):
     
     mask_theta = numpy.logical_not(mask_pos | mask_neg)
 
-    return mask_theta * f(pm) + mask_pos * f1[ :-1, :] + \
+    return mask_theta * pm * v(pm) + mask_pos * f1[ :-1, :] + \
            mask_neg * f1[1:, :]
 
 #
-# one_step_hyperbolic_godunov
-#
+# function for solving the 2d hyperbolic equation
+# \pt A + div(A v(A) w(t,x)) = 0
+# with an explicit Godunov-type method
 def one_step_hyperbolic_godunov(A, v, w_x, w_y, dx, dy, dt):
     """
     This function performs a one time step for the hyperbolic equation
@@ -217,7 +218,7 @@ def one_step_hyperbolic_godunov(A, v, w_x, w_y, dx, dy, dt):
 
     gf = Godunov_Flux_x(A, v, 0.5) * w_x
 
-    A = A[1:-1, 1:-1] - (dt / dx) * (gf[1:-1, :-1] - gf[1:-1, 1:])
+    A = A[1:-1, 1:-1] + (dt / dx) * (gf[1:-1, :-1] - gf[1:-1, 1:])
 
     
     # y-split
@@ -229,6 +230,6 @@ def one_step_hyperbolic_godunov(A, v, w_x, w_y, dx, dy, dt):
     gf = Godunov_Flux_y(A, v, 0.5) * w_y
     
     
-    A = A[1:-1, 1:-1] - (dt / dy) * (gf[:-1, 1:-1] - gf[1:, 1:-1])
+    A = A[1:-1, 1:-1] + (dt / dy) * (gf[:-1, 1:-1] - gf[1:, 1:-1])
 
     return A
