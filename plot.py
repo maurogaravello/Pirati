@@ -95,3 +95,6 @@ if __name__ == '__main__':
     if args.solution:
         plt.plt_solutions(simul_pirates, args.levels_color)
         plt.movie(simul_pirates)
+
+
+    logging.info('Finished  at ' + str(datetime.now()))
