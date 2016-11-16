@@ -103,8 +103,15 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
     vel_y = cal_I_y + nu_y
     # vel_x = nu_x
     # vel_y = nu_y
+
+    # (vel_x, vel_y) should be at most of norm 1!!!
+    vel_pseudo_norm = numpy.maximum(numpy.sqrt(vel_x**2 + vel_y**2), 1.)
+    vel_x = vel_x / vel_pseudo_norm
+    vel_y = vel_y / vel_pseudo_norm
+        
     s_new = pde.one_step_hyperbolic_godunov(s_density, velocity, vel_x, vel_y, dx, dy, dt)
 
+    s_new = numpy.minimum(numpy.maximum(s_new, 0.), 1.)
 
     ################################
     # Evolution of police position
