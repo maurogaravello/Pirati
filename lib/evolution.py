@@ -10,7 +10,9 @@ import save
 # function for solving the system in a one temporal step 
 # 
 def one_step_evolution(p_density, s_density, police, xx, yy,
-                       p_kernel, cut_off, dx, dy, dt, kappa, a,
+                       p_kernel, cut_off_pirates,
+                       cut_off_ships, cut_off_police,
+                       dx, dy, dt, kappa, a,
                        velocity, nu_x, nu_y):
     """
     This function performs a one time step evolution for the whole system
@@ -24,7 +26,9 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
                and s_density
     :param p_kernel: numpy 2d array describing the kernel in the equation for
                      pirates. Same shape as p_density
-    :param cut_off: cut_off function.
+    :param cut_off_pirates: cut_off function for pirates.
+    :param cut_off_ships: cut_off function for ships.
+    :param cut_off_police: cut_off function for police.
     :param dx: float. The size of the x-mesh
     :param dy: float. The size of the y-mesh
     :param dt: float. The time step. It should satisfy a stability condition
@@ -70,15 +74,15 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
     trash, div1 = numpy.gradient(flux_x, dy, dx)
     div2, trash = numpy.gradient(flux_y, dy, dx)
     div = - div1 - div2
-
     
     # term depending on the police
     f = numpy.zeros_like(xx)
     for i in xrange(len(police)):
-        f += a[i] * cut_off(xx - police[i][0], yy - police[i][1])
-
+        f += a[i] * cut_off_pirates(xx - police[i][0], yy - police[i][1])
 
     p_new = pde.one_step_parabolic(p_density, xx, yy, div, -f, dx, dy, dt)
+
+
 
     ################################
     # Evolution of ship density
@@ -86,23 +90,19 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
 
     # 2d convolution on a fixed mesh
     # h * k [n, m] = dx * dy * convolve2d(h, k)
-    cal_I1_x = - dx * dy * scipy.signal.convolve2d(p_density, xx * cut_off(xx, yy), mode='same')
-    cal_I1_y = - dx * dy * scipy.signal.convolve2d(p_density, yy * cut_off(xx, yy), mode='same')
+    cal_I1_x = - dx * dy * scipy.signal.convolve2d(p_density, xx * cut_off_ships(xx, yy), mode='same')
+    cal_I1_y = - dx * dy * scipy.signal.convolve2d(p_density, yy * cut_off_ships(xx, yy), mode='same')
 
     cal_I2_x = numpy.zeros_like(xx)
     cal_I2_y = numpy.zeros_like(xx)
     for i in xrange(len(police)):
-        cal_I2_x += cut_off(xx - police[i][0], yy - police[i][1]) * (police[i][0] - xx)
-        cal_I2_y += cut_off(xx - police[i][0], yy - police[i][1]) * (police[i][1] - yy)
+        cal_I2_x += cut_off_ships(xx - police[i][0], yy - police[i][1]) * (police[i][0] - xx)
+        cal_I2_y += cut_off_ships(xx - police[i][0], yy - police[i][1]) * (police[i][1] - yy)
 
     cal_I_x = cal_I1_x + cal_I2_x
     cal_I_y = cal_I1_y + cal_I2_y
-    # cal_I_x = cal_I2_x
-    # cal_I_y = cal_I2_y
     vel_x = cal_I_x + nu_x
     vel_y = cal_I_y + nu_y
-    # vel_x = nu_x
-    # vel_y = nu_y
 
     # (vel_x, vel_y) should be at most of norm 1!!!
     vel_pseudo_norm = numpy.maximum(numpy.sqrt(vel_x**2 + vel_y**2), 1.)
@@ -113,24 +113,23 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
 
     s_new = numpy.minimum(numpy.maximum(s_new, 0.), 1.)
 
+
+    
     ################################
     # Evolution of police position
     ################################
 
     police_new = []
     for i in xrange(len(police)):
-        temp = cut_off(police[i][0] - xx, police[i][1] - yy) * p_density * s_density
+        temp = cut_off_police(police[i][0] - xx, police[i][1] - yy) * p_density * s_density
         F1_x = dx * dy * numpy.sum(temp * (xx - police[i][0]))
         F1_y = dx * dy * numpy.sum(temp * (yy - police[i][1]))
-
-        # F1_x = dx * dy * scipy.signal.convolve2d(p_density * s_density, -temp * (xx - police[i][0]), mode = 'same')
-        # F1_y = dx * dy * scipy.signal.convolve2d(p_density * s_density, -temp * (yy - police[i][1]), mode = 'same')
 
         F2_x = police_sum_x - M * police[i][0]
         F2_y = police_sum_y - M * police[i][1]
 
         F3_x = 0.   #control_x
-        F3_y = 0.   #control_y
+        F3_y = -0.1   #control_y
         
         police_new.append(ode.ode(F1_x + F2_x + F3_x, F1_y + F2_y + F3_y, police[i], dt))
 
@@ -169,7 +168,8 @@ def evolution(pirates):
 
         # evolution from t to t + dt
         (p_density, s_density, police) = one_step_evolution(p_density, s_density, police, pirates.x_mesh, pirates.y_mesh,
-                                                            pirates.kernel_mathcal_K, pirates.cut_off_C, pirates.dx, pirates.dy, pirates.dt, pirates.kappa, pirates.a, pirates.ships_speed, pirates.ships_direction_mesh[0], pirates.ships_direction_mesh[1])
+                                                            pirates.kernel_mathcal_K, pirates.cut_off_C_pirates, pirates.cut_off_C_ships, pirates.cut_off_C_police, pirates.dx, pirates.dy,
+                                                            pirates.dt, pirates.kappa, pirates.a, pirates.ships_speed, pirates.ships_direction_mesh[0], pirates.ships_direction_mesh[1])
 
         # printing
         if pirates.printing[i]:
