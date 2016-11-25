@@ -149,7 +149,7 @@ class pirates(object):
         self.dt = the time step
 
         """
-        K = min(int(float(len(self.time))/self.pictures), 90)
+        K = max(int(float(len(self.time))/self.pictures), 1)
         self.printing = np.zeros_like(self.time, dtype= bool)
         self.printing[::K] = True
         self.printing[-1] = True

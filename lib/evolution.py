@@ -5,6 +5,9 @@ import scipy.signal
 import pde
 import ode
 import save
+import sys
+import logging
+from datetime import datetime
 
 #
 # function for solving the system in a one temporal step 
@@ -164,13 +167,24 @@ def evolution(pirates):
     police = pirates.police_initial_positions
 
     print_number = 1
-    for i in xrange(1, len(pirates.time)):
+    steps = len(pirates.time)
+    for i in xrange(1, steps):
 
         # evolution from t to t + dt
         (p_density, s_density, police) = one_step_evolution(p_density, s_density, police, pirates.x_mesh, pirates.y_mesh,
                                                             pirates.kernel_mathcal_K, pirates.cut_off_C_pirates, pirates.cut_off_C_ships, pirates.cut_off_C_police, pirates.dx, pirates.dy,
                                                             pirates.dt, pirates.kappa, pirates.a, pirates.ships_speed, pirates.ships_direction_mesh[0], pirates.ships_direction_mesh[1])
 
+        # progresses
+        sys.stdout.write('\r')
+        # the exact output you're looking for:
+        percentage = i * 100 /steps
+        sys.stdout.write("[%-100s] %d%%" % ('='*percentage, percentage))
+        sys.stdout.flush()
+
+        if i%100 == 0:
+            logging.info('Completed step ' + str(i) + ' over ' + str(steps) + ' steps at time ' + str(datetime.now()))
+        
         # printing
         if pirates.printing[i]:
         #if True:
