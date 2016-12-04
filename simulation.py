@@ -19,7 +19,7 @@ import evolution
 
 if __name__ == '__main__':
 
-    desc = """simulation.py ....."""
+    desc = """simulation.py performs the simulation"""
 
     parser = argparse.ArgumentParser(description = desc, prog = "simulation.py")
     parser.add_argument('DirName', type=str, help="Enter the name of the directory")
