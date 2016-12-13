@@ -16,7 +16,7 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
                        p_kernel, cut_off_pirates,
                        cut_off_ships, cut_off_police,
                        dx, dy, dt, kappa, a,
-                       velocity, nu_x, nu_y):
+                       velocity, nu_x, nu_y, controls, time):
     """
     This function performs a one time step evolution for the whole system
 
@@ -40,6 +40,8 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
     :param velocity: function describing the speed of the ship.
     :param nu_x: x-direction of the geometric component of nu
     :param nu_y: x-direction of the geometric component of nu
+    :param controls: function giving the controls for police vessels
+    :param time: float. initial time
 
     The output is a tuple (p_new, s_new, police_new) of three elements.
     :output p_new: numpy 2d array of the same shape as p_density
@@ -131,8 +133,8 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
         F2_x = police_sum_x - M * police[i][0]
         F2_y = police_sum_y - M * police[i][1]
 
-        F3_x = 0.   #control_x
-        F3_y = -0.1   #control_y
+        F3_x = controls(time)[i][0]   #control_x
+        F3_y = controls(time)[i][1]   #control_y
         
         police_new.append(ode.ode(F1_x + F2_x + F3_x, F1_y + F2_y + F3_y, police[i], dt))
 
@@ -168,13 +170,23 @@ def evolution(pirates):
 
     print_number = 1
     steps = len(pirates.time)
+    cost = pirates.dt * numpy.sum(p_density * s_density)
     for i in xrange(1, steps):
 
+        police_old = police
+        
         # evolution from t to t + dt
         (p_density, s_density, police) = one_step_evolution(p_density, s_density, police, pirates.x_mesh, pirates.y_mesh,
                                                             pirates.kernel_mathcal_K, pirates.cut_off_C_pirates, pirates.cut_off_C_ships, pirates.cut_off_C_police, pirates.dx, pirates.dy,
-                                                            pirates.dt, pirates.kappa, pirates.a, pirates.ships_speed, pirates.ships_direction_mesh[0], pirates.ships_direction_mesh[1])
+                                                            pirates.dt, pirates.kappa, pirates.a, pirates.ships_speed, pirates.ships_direction_mesh[0], pirates.ships_direction_mesh[1], pirates.controls, pirates.time[i])
 
+        # cost
+        lenght2 = 0.
+        cost += pirates.dt * numpy.sum(p_density * s_density)
+        for ii in xrange(0, pirates.police_vessels):
+            lenght2 += (police[ii][0] - police_old[ii][0])**2 + (police[ii][1] - police_old[ii][1])**2
+        cost += numpy.sqrt(lenght2)
+        
         # progresses
         sys.stdout.write('\r')
         # the exact output you're looking for:
@@ -189,7 +201,11 @@ def evolution(pirates):
         if pirates.printing[i]:
         #if True:
             name = 'saving_' + str(print_number).zfill(4)
-            save.solution_Save(pirates.base_directory, name, pirates.time[i], p_density, s_density, police)
+            save.solution_Save(pirates.base_directory, name, pirates.time[i], p_density, s_density, police, cost)
             print_number += 1
 
         
+    # saving the cost
+    save.cost_Save(pirates.base_directory, 'cost', cost)
+
+    logging.info('Final cost = ' + str(cost))

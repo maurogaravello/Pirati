@@ -46,7 +46,7 @@ if __name__ == '__main__':
     
     simul_pirates = pirates.pirates(x_1, x_2, y_1, y_2, n_x, n_y, M, tMax, d_o,
                                     InitialDatum_rho, InitialDatum_A,
-                                    speed_ships, nu, dirName, mathcal_K, cut_off_C_pirates, kappa, a, cut_off_C_ships, cut_off_C_police)
+                                    speed_ships, nu, dirName, mathcal_K, cut_off_C_pirates, kappa, a, cut_off_C_ships, cut_off_C_police, controls)
 
     evolution.evolution(simul_pirates)
 

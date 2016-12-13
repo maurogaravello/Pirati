@@ -10,7 +10,7 @@ class pirates(object):
 
     def __init__(self, x_1, x_2, y_1, y_2, n_x, n_y, M, tMax, d_o,
                  InitialDatum_rho, InitialDatum_A, speed_ships, nu, DirName,
-                 mathcal_K, cut_off_C_pirates, kappa, a, cut_off_C_ships, cut_off_C_police, pictures = 90):
+                 mathcal_K, cut_off_C_pirates, kappa, a, cut_off_C_ships, cut_off_C_police, controls, pictures = 90):
         """
         Initializatium function for the class.
         :param x_1: float. Lower bound for x-coordinate of the domain
@@ -43,6 +43,7 @@ class pirates(object):
         :param cut_off_C_ships: function describing the kernel in the equation for ships
         :param cut_off_C_police: function describing the kernel in the equation for police
         :param a: array of floats. Coefficients a in the source term f for the eq
+        :param controls: function giving a list of controls.
         :param pictures: int. Approximate number of pictures.
         """
 
@@ -64,6 +65,7 @@ class pirates(object):
         self.police_vessels = M
         self.police_initial_positions = d_o
         self.check_positions()
+        self.controls = controls
 
 
         # ships' velocity
@@ -149,7 +151,7 @@ class pirates(object):
         self.dt = the time step
 
         """
-        K = max(int(float(len(self.time))/self.pictures), 1)
+        K = int(float(len(self.time))/self.pictures) + 1
         self.printing = np.zeros_like(self.time, dtype= bool)
         self.printing[::K] = True
         self.printing[-1] = True
