@@ -194,8 +194,18 @@ class pirates(object):
         """
         self.initial_density_pirates = InitialDatum_rho(self.x_mesh, self.y_mesh)
         self.initial_density_ships = InitialDatum_A(self.x_mesh, self.y_mesh)
-    
 
+    #
+    # Projection into the domain
+    #
+    def project(self, position_police):
+        new_pos = []
+        for i in xrange(len(position_police)):
+            position_x = min(max(position_police[i][0], self.x_1), self.x_2)
+            position_y = min(max(position_police[i][1], self.y_1), self.y_2)
+            new_pos.append((position_x, position_y))
+        return new_pos
+    
     #
     # Function for checking the domain is feasible.
     #

@@ -135,7 +135,7 @@ def one_step_evolution(p_density, s_density, police, xx, yy,
 
         F3_x = controls(time)[i][0]   #control_x
         F3_y = controls(time)[i][1]   #control_y
-        
+
         police_new.append(ode.ode(F1_x + F2_x + F3_x, F1_y + F2_y + F3_y, police[i], dt))
 
 
@@ -180,6 +180,8 @@ def evolution(pirates):
                                                             pirates.kernel_mathcal_K, pirates.cut_off_C_pirates, pirates.cut_off_C_ships, pirates.cut_off_C_police, pirates.dx, pirates.dy,
                                                             pirates.dt, pirates.kappa, pirates.a, pirates.ships_speed, pirates.ships_direction_mesh[0], pirates.ships_direction_mesh[1], pirates.controls, pirates.time[i])
 
+        police = pirates.project(police)
+        
         # cost
         lenght2 = 0.
         cost += pirates.dt * numpy.sum(p_density * s_density)
