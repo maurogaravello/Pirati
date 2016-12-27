@@ -163,10 +163,10 @@ def plt_solutions(pirates, levels = 10):
 
 
         # contour plot of density of pirates
-        plt_contour(pirates.x, pirates.y, p_density, 'Pirates density at time t=' + str("%.3f" %t), pirate_file, dirName, pirates.police_initial_positions, levels)
+        plt_contour(pirates.x, pirates.y, p_density, 'Pirates density at time t=' + str("%.3f" %t), pirate_file, dirName, police, levels)
 
         # contour plot of inital density of ships
-        plt_contour(pirates.x, pirates.y, s_density, 'Ships density at time t=' + str("%.3f" %t), ship_file, dirName, pirates.police_initial_positions, levels)
+        plt_contour(pirates.x, pirates.y, s_density, 'Ships density at time t=' + str("%.3f" %t), ship_file, dirName, police, levels)
 
 #
 # final movie
