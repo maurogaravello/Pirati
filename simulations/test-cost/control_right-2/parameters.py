@@ -52,7 +52,7 @@ def kappa(x):
     return A2 + A3
 
 # coefficients a_i for definition of f (len = M)
-a = [6.] 
+a = [6., 6.] 
 
 
 ######################################################
@@ -84,12 +84,12 @@ def nu(x,y):
 ######################################################
 
 # Number M of police vessels
-M = 1 # integer number
+M = 2 # integer number
 
 # Initial Datum for police vessels
 # d_o -> list of size M
 # each element is a tuple with 2 elements
-d_o = [(2., 3.5)] 
+d_o = [(2., 3.5), (2., 2.5)] 
 
 # Controls
 # function of time giving the controls for the police vessels
@@ -97,7 +97,7 @@ def controls(t):
     """The output should be a list of M tuple"""
 
     # [(1., 0.), (0.,0.), (-1., 0.), (0., 1.), (0., -1.)]
-    return [(0.3 * numpy.cos(t), - 0.3 * numpy.sin(t))]
+    return [(0.3, 0.), (0.3, 0.)]
 
 
 #######################################################
