@@ -52,7 +52,7 @@ def kappa(x):
     return A2 + A3
 
 # coefficients a_i for definition of f (len = M)
-a = [3.] 
+a = [6.] 
 
 
 ######################################################
@@ -97,7 +97,7 @@ def controls(t):
     """The output should be a list of M tuple"""
 
     # [(1., 0.), (0.,0.), (-1., 0.), (0., 1.), (0., -1.)]
-    return [(0., 1.)]
+    return [(0., 0.3)]
 
 
 #######################################################
@@ -120,7 +120,7 @@ def mathcal_K(x, y):
 
 
 # cut-off C (function. Equation for police)
-def cut_off_C_police(x, y, radius = 5.0):
+def cut_off_C_police(x, y, radius = 1.0):
     # x and y are meshes!
     
     k = (x**2 + y**2 < radius**2) * (radius**2 - x**2 - y**2)
@@ -134,7 +134,7 @@ def cut_off_C_police(x, y, radius = 5.0):
 
 
 # cut-off C_i (function. Source term for eq. for pirates)
-def cut_off_C_pirates(x, y, radius = 5.0):
+def cut_off_C_pirates(x, y, radius = 2.0):
     # x and y are meshes!
     
     k = (x**2 + y**2 < radius**2) * (radius**2 - x**2 - y**2)
@@ -147,7 +147,7 @@ def cut_off_C_pirates(x, y, radius = 5.0):
 
 
 # cut-off C_i (function. Flux term for eq. for ships)
-def cut_off_C_ships(x, y, radius = 100.0):
+def cut_off_C_ships(x, y, radius = 2.0):
     # x and y are meshes!
     
     k = (x**2 + y**2 < radius**2) * (radius**2 - x**2 - y**2)
