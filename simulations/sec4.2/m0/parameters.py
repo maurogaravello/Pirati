@@ -89,7 +89,7 @@ M = 0 # integer number
 # Initial Datum for police vessels
 # d_o -> list of size M
 # each element is a tuple with 2 elements
-d_o = [(2., 3.5)] 
+d_o = [] 
 
 # Controls
 # function of time giving the controls for the police vessels
